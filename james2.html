@@ -131,6 +131,10 @@
               cell.setAttribute("contenteditable", "true");
               cell.setAttribute("onclick", "makeBold(this)");
               cell.setAttribute("onblur", "rewriteNextItemsInRow(this)");
+              var currentMonth = new Date().getMonth()+1;
+              if (j == currentMonth) {
+                cell.setAttribute("bgcolor", "#f9f098");
+              }
               row.appendChild(cell);
             }
 
@@ -148,6 +152,9 @@
              var cellLast = document.createElement("th");    
              var cellLastText = document.createTextNode(months[j-1]); 
               cellLast.appendChild(cellLastText);
+              if (j == currentMonth) {
+                cellLast.setAttribute("bgcolor", "#f7e960");
+              }
               rowLast.appendChild(cellLast);  
             }
             tFoot.appendChild(rowLast);
