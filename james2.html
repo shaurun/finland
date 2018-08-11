@@ -58,11 +58,11 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
     
-    function rewriteNextItemsInRow(element) {
+    function rewriteNextItemsInRow(element, year) {
         var text = element.childNodes[0].data;
         var row = element.parentElement.rowIndex;
         var col = element.cellIndex;
-        var table = document.getElementById("chartsTable");
+        var table = document.getElementById("chartsTable"+year);
         if (isNaN(text) || text <= 0) {
           text = '-'
         }
@@ -94,7 +94,7 @@
           }
       }
       
-      function generateTable() {
+      function generateTable(year) {
         //body reference 
         var body = document.getElementById("chart");
 
@@ -109,7 +109,7 @@
         
         tHead.appendChild(document.createElement("th"));
         var th = document.createElement("th");
-        var thText = document.createTextNode("2018"); 
+        var thText = document.createTextNode(year); 
         th.appendChild(thText);
         th.setAttribute('colspan', months.length);
         tHead.appendChild(th);
@@ -130,9 +130,10 @@
               cell.appendChild(cellText);
               cell.setAttribute("contenteditable", "true");
               cell.setAttribute("onclick", "makeBold(this)");
-              cell.setAttribute("onblur", "rewriteNextItemsInRow(this)");
+              cell.setAttribute("onblur", "rewriteNextItemsInRow(this, " + year + ")");
               var currentMonth = new Date().getMonth()+1;
-              if (j == currentMonth) {
+              var currentYear = new Date().getFullYear();
+              if (j == currentMonth && currentYear==year) {
                 cell.setAttribute("bgcolor", "#f9f098");
               }
               row.appendChild(cell);
@@ -166,7 +167,7 @@
         // put <table> in the <body>
         body.appendChild(table);
         // tbl border attribute to 
-        table.setAttribute("id", "chartsTable");
+        table.setAttribute("id", "chartsTable"+year);
         table.setAttribute("class", "datagrid");
       }
      
@@ -176,11 +177,12 @@
 
 <body>
 
-<div id="chart" class="datagrid">
-</div>
+<div id="chart" class="datagrid"></div>
   
   <script>
-  generateTable();
+  generateTable("2018");
+  generateTable("2019");
+  generateTable("2020");
   </script>
 
 </body>
