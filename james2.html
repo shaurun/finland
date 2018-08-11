@@ -1,0 +1,180 @@
+<html>
+<head>
+
+<style>
+    div.chart {
+      display: inline-block;
+      position: relative;
+      width: 70%;
+    }
+    div.input {
+      display: inline-block;
+      padding-left: 5px;
+      position: absolute;
+      left: 70%;
+    }
+    div#nextSection {
+      margin-top: 50px;
+    }
+    
+  .datagrid table { border-collapse: collapse; text-align: left; } 
+
+  .datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; 
+  overflow: hidden; border: 1px solid #D0D5D6; -webkit-border-radius: 3px; -moz-border-radius: 3px; 
+  border-radius: 3px; }
+  
+  .datagrid table td, .datagrid table th { padding: 3px 10px; font-size: 12px}
+  .datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #a3a3a3), 
+  color-stop(1, #c3c3c3) );background:-moz-linear-gradient( center top, #a3a3a3 5%, #c3c3c3 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8C8C8C', endColorstr='#7D7D7D');
+  background-color:#8C8C8C; color:#FFFFFF; font-size: 14px; font-weight: bold; border-left: 1px solid #A3A3A3; 
+  text-align: center;} 
+  .datagrid table thead th:first-child {  border: none; }
+  .datagrid table tbody td {  color: #929292; border-left: 1px solid #DBDBDB;font-size: 12px;
+  font-weight: normal; }
+  .datagrid table tbody .alt td { background: #EBEBEB; color: #7D7D7D; }
+  .datagrid table tbody td:first-child { border-left: none; }
+  .datagrid table tbody tr:last-child td { border-bottom: none; }
+  .datagrid table tfoot td div { border-top: 1px solid #D0D5D6;background: #EBEBEB;} 
+  .datagrid table tfoot td {  padding: 0; font-size: 12px } 
+  .datagrid table tfoot td div{ padding: 2px; }
+  .datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }
+  .datagrid table tfoot  li { display: inline; }
+  .datagrid table tfoot li a { 
+  text-decoration: none; display: inline-block;  
+  padding: 2px 8px; margin: 1px;color: #F5F5F5;border: 1px solid #8C8C8C;
+  -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; 
+  background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #8C8C8C), 
+  color-stop(1, #7D7D7D) );background:-moz-linear-gradient( center top, #8C8C8C 5%, #7D7D7D 100% );
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8C8C8C', endColorstr='#7D7D7D');
+  background-color:#8C8C8C; }
+  .datagrid table tfoot ul.active, 
+  .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #7D7D7D; color: #F5F5F5;
+   background: none; background-color:#8C8C8C;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+
+   </style>
+
+<!--<script type="text/javascript" src="editableTable.js"></script>-->
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+    
+    function rewriteNextItemsInRow(element) {
+        var text = element.childNodes[0].data;
+        var row = element.parentElement.rowIndex;
+        var col = element.cellIndex;
+        var table = document.getElementById("chartsTable");
+        if (isNaN(text) || text <= 0) {
+          text = '-'
+        }
+        for (var i = col; i < table.rows[row].cells.length; i++) {
+          table.rows[row].cells[i].childNodes[0].data = text;
+        }
+      }
+      
+      function makeBold(element) {
+        if (isNaN(element.childNodes[0].data)) {
+          element.childNodes[0].data = '';
+        } else {
+          element.style.fontWeight = "bold";
+          element.style.color = "black";
+        }
+      }
+      
+      function maskCurrecnyField(element) {
+        text = element.value;
+        if (text == null) {
+          text = element.childNodes[0].data;
+          text = text.replace(new RegExp(',', 'g'), '');
+          text = text.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          element.childNodes[0].data = text;
+        } else {
+          text = text.replace(new RegExp(',', 'g'), '');
+          text = text.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+          element.value = text;
+          }
+      }
+      
+      function generateTable() {
+        //body reference 
+        var body = document.getElementById("chart");
+
+        // create elements <table> and a <tbody>
+        var table = document.createElement("table");
+        var tHead = document.createElement("thead");
+        var tBody = document.createElement("tbody");
+        var tFoot = document.createElement("tfoot");
+
+        var categories = ["Custom 1", "Custom 2","Bonus - Cash","Bonus - Newport"];
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        
+        tHead.appendChild(document.createElement("th"));
+        var th = document.createElement("th");
+        var thText = document.createTextNode("2018"); 
+        th.appendChild(thText);
+        th.setAttribute('colspan', months.length);
+        tHead.appendChild(th);
+        // cells creation
+        for (var i = 0; i < categories.length; i++) {
+            // table row creation
+            var row = document.createElement("tr");
+            var cell1 = document.createElement("th");    
+            var cellText1 = document.createTextNode(categories[i]); 
+            cell1.appendChild(cellText1);
+            row.appendChild(cell1);
+            for (var j = 1; j <= months.length; j++) {
+                // create element <td> and text node 
+                //Make text node the contents of <td> element
+                // put <td> at end of the table row
+             var cell = document.createElement("td");    
+             var cellText = document.createTextNode("-"); 
+              cell.appendChild(cellText);
+              cell.setAttribute("contenteditable", "true");
+              cell.setAttribute("onclick", "makeBold(this)");
+              cell.setAttribute("onblur", "rewriteNextItemsInRow(this)");
+              row.appendChild(cell);
+            }
+
+            //row added to end of table body
+            tBody.appendChild(row);
+        }
+        
+        var rowLast = document.createElement("tr");
+            var cellLast1 = document.createElement("th");  
+            rowLast.appendChild(cellLast1); 
+            for (var j = 1; j <= months.length; j++) {
+                // create element <td> and text node 
+                //Make text node the contents of <td> element
+                // put <td> at end of the table row
+             var cellLast = document.createElement("th");    
+             var cellLastText = document.createTextNode(months[j-1]); 
+              cellLast.appendChild(cellLastText);
+              rowLast.appendChild(cellLast);  
+            }
+            tFoot.appendChild(rowLast);
+
+        // append the <tbody> inside the <table>
+        table.appendChild(tHead);
+        table.appendChild(tBody);
+        table.appendChild(tFoot);
+        // put <table> in the <body>
+        body.appendChild(table);
+        // tbl border attribute to 
+        table.setAttribute("id", "chartsTable");
+        table.setAttribute("class", "datagrid");
+      }
+     
+      
+</script>
+</head>
+
+<body>
+
+<div id="chart" class="datagrid">
+</div>
+  
+  <script>
+  generateTable();
+  </script>
+
+</body>
+</html>
