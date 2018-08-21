@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{%  if sections|length == 0 %}
+    <label class="error">No sections to display</label>
+{%  endif %}
+
+{% for section in sections %}
+    <p><span class="headline">{{ section.title }}</span></p>
+{% endfor %}
+
+</body>
+</html>
