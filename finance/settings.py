@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'finance.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
+        'ENGINE': 'sqlite3',
         'NAME': 'finlandDB',
     }
 }
