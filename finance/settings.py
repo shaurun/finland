@@ -25,7 +25,7 @@ SECRET_KEY = '0ef#esu7t_q%w#p8sj1^^o4!yrd@qqi508^tp1)su2ha%(b#9e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['intense-scrubland-84863.herokuapp.com']
+ALLOWED_HOSTS = ['intense-scrubland-84863.herokuapp.com', 'localhost']
 
 
 # Application definition
