@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from pymongo.errors import OperationFailure
 
 from FinLand.models import Section
 from FinLand.mongo import MongoDBClient
@@ -12,8 +13,9 @@ def index(request):
     return render(request, "index.html");
 
 def returnMatrix(request):
-    user = client.find_document("users", {"name": "James"})
-    if (user is None):
+    try:
+        user = client.find_document("users", {"name": "James"})
+    except OperationFailure:
         user = client.insert_document('users', {"name": "James", "password": "pass"})
         client.insert_document("return_matrices", {"user":user['_id'], "present_value": "500,000", "years": 15, "actual_contributions": "1,000,000"})
 
