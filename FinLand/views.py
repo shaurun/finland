@@ -5,7 +5,7 @@ from FinLand.models import Section
 from FinLand.mongo import MongoDBClient
 
 #client = MongoDBClient('localhost', 27017)
-client = MongoDBClient('mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com', 31902)
+client = MongoDBClient('mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com/heroku_4nzjwz0z', 31902)
 #client.connect('finlandDB')
 client.connect('heroku_4nzjwz0z')
 
@@ -13,11 +13,12 @@ def index(request):
     return render(request, "index.html");
 
 def returnMatrix(request):
-    try:
-        user = client.find_document("users", {"name": "James"})
-    except OperationFailure:
-        user = client.insert_document('users', {"name": "James", "password": "pass"})
-        client.insert_document("return_matrices", {"user":user['_id'], "present_value": "500,000", "years": 15, "actual_contributions": "1,000,000"})
+
+    user = client.find_document("users", {"name": "James"})
+
+    #client.insert_document('users', {"name": "James", "password": "pass"})
+    #user = client.find_document("users", {"name": "James"})
+    #client.insert_document("return_matrices", {"user":user['_id'], "present_value": "500,000", "years": 15, "actual_contributions": "1,000,000"})
 
     if (request.POST):
         years = request.POST.get('years', '');
