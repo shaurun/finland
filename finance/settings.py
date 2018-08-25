@@ -25,11 +25,12 @@ SECRET_KEY = '0ef#esu7t_q%w#p8sj1^^o4!yrd@qqi508^tp1)su2ha%(b#9e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['intense-scrubland-84863.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['intense-scrubland-84863.herokuapp.com', 'localhost', "127.0.0.1"]
 
 # Application definition
-SESSION_ENGINE = 'FinLand.mango.session'
-AUTHENTICATION_BACKENDS = ('FinLand.mango.auth.Backend',)
+#SESSION_ENGINE = 'FinLand.mango.session'
+#AUTH_USER_MODEL = 'FinLand.User'
+#AUTHENTICATION_BACKENDS = ('FinLand.auth.Backend',)
 MONGODB_HOST = 'mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com/heroku_4nzjwz0z'  # enter your MongoDB hostname here
 MONGODB_PORT = 31902         # enter your MongoDB port here (None for default port)
 MONGODB_NAME = 'heroku_4nzjwz0z'       # enter your MongoDB database name here
@@ -80,8 +81,14 @@ WSGI_APPLICATION = 'finance.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'finlandDB',
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'djongo',
+        'NAME': 'heroku_4nzjwz0z',
+        'HOST': 'mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com:31902/heroku_4nzjwz0z',
+        'PORT': 31902,
+        'USER': 'heroku_4nzjwz0z',
+        'PASSWORD': 'dcvtdbro5ppqqahpdrc8m83lcl',
     }
 }
 

@@ -106,7 +106,7 @@ class User(Model):
         #raise SiteProfileNotAvailable
 
     @classmethod
-    def create_user(cls, username, email, password=None):
+    def create_user(cls, username, email="123.123.com", password=None):
         "Creates and saves a User with the given username, e-mail and password."
         now = datetime.datetime.now()
         user = cls({'username': username,
@@ -155,7 +155,7 @@ def get_hexdigest(algorithm, salt, raw_password):
         return crypt.crypt(raw_password, salt)
 
     if algorithm == 'md5':
-        return hashlib.md5(salt + raw_password).hexdigest()
+        return hashlib.md5((salt + raw_password).encode('utf-8')).hexdigest()
     elif algorithm == 'sha1':
         return hashlib.sha1(salt + raw_password).hexdigest()
     raise ValueError("Got unknown password algorithm type in password.")
