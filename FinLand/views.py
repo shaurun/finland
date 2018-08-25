@@ -2,7 +2,6 @@ from django.contrib import auth
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
-from pymongo.errors import OperationFailure
 
 from FinLand.models import Section
 from FinLand.mongo import MongoDBClient

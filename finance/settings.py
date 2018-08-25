@@ -27,7 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['intense-scrubland-84863.herokuapp.com', 'localhost']
 
-
 # Application definition
 SESSION_ENGINE = 'mango.session'
 AUTHENTICATION_BACKENDS = ('mango.auth.Backend',)
