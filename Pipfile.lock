@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c095b9b35bacb4fdb38422bb74250f95495aebbb64050ed9791dd61fa92e5ad3"
+            "sha256": "f70999f851430e6b9a1d56d0c1b0e486814736afd80398cb249abd679022ae47"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -98,12 +98,6 @@
                 "sha256:f93d508ca64d924d478fb11e272e09524698f0c581d9032e68958cfbdd41faef"
             ],
             "version": "==2.7.5"
-        },
-        "pymango": {
-            "hashes": [
-                "sha256:4c32e907d42c1a4e6481ee56473015f700cfed9eee650ee7d2f319216ac1c0ca"
-            ],
-            "version": "==0.1.1"
         },
         "pymongo": {
             "hashes": [
