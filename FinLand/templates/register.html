@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FinLand</title>
+</head>
+<body>
+
+    <h1>Вход/регистрация</h1>
+
+    <div>
+        <form action="/register" method="post">
+            {%  csrf_token %}
+            {{ form }}
+            <input class="button" type="submit" value="Зарегистрироваться"/>
+            <a href="{% url 'login' %}">Войти</a>
+        </form>
+    </div>
+
+</body>
+</html>

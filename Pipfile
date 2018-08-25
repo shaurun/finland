@@ -8,6 +8,7 @@ gunicorn = "*"
 django-heroku = "*"
 requests = "*"
 pymongo = "*"
+pymango = "*"
 
 [requires]
 python_version = "3.6"

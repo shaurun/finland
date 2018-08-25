@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.contrib import auth
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+from django.template.context_processors import csrf
 from pymongo.errors import OperationFailure
 
 from FinLand.models import Section
@@ -54,4 +57,20 @@ def dbTest(request):
         'sections': sections
     }
     return render(request, "dbtest.html", context);
+
+def register(request):
+    args = {};
+    args.update(csrf(request));
+    args['form'] = UserCreationForm();
+    if (request.POST):
+        new_user_form = UserCreationForm(request.POST);
+        if (new_user_form.is_valid()):
+            new_user_form.save();
+            new_user = auth.authenticate(username=new_user_form.cleaned_data['username'],
+                                         password=new_user_form.cleaned_data['password2']);
+            auth.login(request, new_user);
+            return redirect("/");
+        else:
+            args['form'] = new_user_form;
+    return render(request, "register.html", args);
 

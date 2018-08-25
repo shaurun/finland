@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f70999f851430e6b9a1d56d0c1b0e486814736afd80398cb249abd679022ae47"
+            "sha256": "c095b9b35bacb4fdb38422bb74250f95495aebbb64050ed9791dd61fa92e5ad3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -17,10 +17,10 @@
     "default": {
         "certifi": {
             "hashes": [
-                "sha256:4c1d68a1408dd090d2f3a869aa94c3947cc1d967821d1ed303208c9f41f0f2f4",
-                "sha256:b6e8b28b2b7e771a41ecdd12d4d43262ecab52adebbafa42c77d6b57fb6ad3a4"
+                "sha256:376690d6f16d32f9d1fe8932551d80b23e9d393a8578c5633a2ed39a64861638",
+                "sha256:456048c7e371c089d0a77a5212fb37a2c2dce1e24146e3b7e0261736aaeaa22a"
             ],
-            "version": "==2018.8.13"
+            "version": "==2018.8.24"
         },
         "chardet": {
             "hashes": [
@@ -98,6 +98,12 @@
                 "sha256:f93d508ca64d924d478fb11e272e09524698f0c581d9032e68958cfbdd41faef"
             ],
             "version": "==2.7.5"
+        },
+        "pymango": {
+            "hashes": [
+                "sha256:4c32e907d42c1a4e6481ee56473015f700cfed9eee650ee7d2f319216ac1c0ca"
+            ],
+            "version": "==0.1.1"
         },
         "pymongo": {
             "hashes": [

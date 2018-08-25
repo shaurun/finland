@@ -29,6 +29,11 @@ ALLOWED_HOSTS = ['intense-scrubland-84863.herokuapp.com', 'localhost']
 
 
 # Application definition
+SESSION_ENGINE = 'mango.session'
+AUTHENTICATION_BACKENDS = ('mango.auth.Backend',)
+MONGODB_HOST = 'mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com/heroku_4nzjwz0z'  # enter your MongoDB hostname here
+MONGODB_PORT = 31902         # enter your MongoDB port here (None for default port)
+MONGODB_NAME = 'heroku_4nzjwz0z'       # enter your MongoDB database name here
 
 INSTALLED_APPS = [
     'django.contrib.admin',
