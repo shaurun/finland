@@ -16,7 +16,7 @@
 }
 
 #header h1 {
-    margin-left: 60px;;
+    margin-left: 65px;
     float: left;
     width: 197px;
     height: 25px;
@@ -124,17 +124,15 @@ background:#555;
 border-color:transparent #0089e0 transparent transparent;
 }
 
-            body {
-                background: #edf2f9;
-            }
-
-            p { color: #111; font-family: 'Open Sans Condensed', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase;}
+p { color: #111; font-family: 'Open Sans Condensed', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase;}
 
     </style>
 </head>
 <body>
 
-<div id="header">
+<div class="page-wrap">
+
+    <div id="header">
   <h1>Logo</h1>
       {% if user.is_authenticated %}
           <form action="logout" method="get">
@@ -156,15 +154,17 @@ border-color:transparent #0089e0 transparent transparent;
       {% endif %}
 </div>
 
-    <div>
-        <p>This page exists for easier access to features. Use following links to access pages for testing:</p>
+
+        <h1>This page exists for easier access to features. Use following links to access pages for testing:</h1>
         <div class="list-type3">
         <ul>
             <li><a href="returnMatrix">Return Matrix</a> </li>
             <li><a href="moneyFlow">Money Flow</a> </li>
         </ul>
         </div>
-    </div>
+
+</div>
+
 
 </body>
 </html>

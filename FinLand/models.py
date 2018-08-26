@@ -1,11 +1,18 @@
 # Create your models here.
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import FieldDoesNotExist
+from django.db.models import Model
 
 from FinLand.mongo import MongoDBClient
 
 client = MongoDBClient('mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com/heroku_4nzjwz0z', 31902)
 client.connect('heroku_4nzjwz0z')
+
+class ReturnMatrix(Model):
+    pass
+
+
+
 """
 class User(AbstractBaseUser):
     _collection = "users"
