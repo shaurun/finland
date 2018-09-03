@@ -1,7 +1,6 @@
-<html>
-<head>
+{%  extends 'common.html' %}
 
-<style>
+{% block style_extension %}
     div.chart {
       display: inline-block;
       position: relative;
@@ -51,13 +50,21 @@
   .datagrid table tfoot ul.active, 
   .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #7D7D7D; color: #F5F5F5;
    background: none; background-color:#8C8C8C;}div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+{% endblock%}
 
-   </style>
-
-<!--<script type="text/javascript" src="editableTable.js"></script>-->
+{% block js_scripts %}
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-    
+
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+         window.onbeforeunload = closingCode;
+
+      function closingCode(){
+         alert(localStorage.getItem("year2018"));
+      }
+
+
     function rewriteNextItemsInRow(element, year) {
         var text = element.childNodes[0].data;
         var row = element.parentElement.rowIndex;
@@ -66,9 +73,12 @@
         if (isNaN(text) || text <= 0) {
           text = '-'
         }
+        var yearJSON = JSON.parse(localStorage.getItem("year"+year));
         for (var i = col; i < table.rows[row].cells.length; i++) {
           table.rows[row].cells[i].childNodes[0].data = text;
+          yearJSON["categories"][row]["values"][i] = text;
         }
+        localStorage.setItem("year"+year, JSON.stringify(yearJSON))
       }
       
       function makeBold(element) {
@@ -95,6 +105,8 @@
       }
       
       function generateTable(year) {
+          year = year.replace(new RegExp('&#39;', 'g'), '"');
+          year = JSON.parse(year);
         //body reference 
         var body = document.getElementById("chart");
 
@@ -104,12 +116,10 @@
         var tBody = document.createElement("tbody");
         var tFoot = document.createElement("tfoot");
 
-        var categories = ["Custom 1", "Custom 2","Bonus - Cash","Bonus - Newport"];
-        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        
+        var  categories = year.categories;
         tHead.appendChild(document.createElement("th"));
         var th = document.createElement("th");
-        var thText = document.createTextNode(year); 
+        var thText = document.createTextNode(year.year);
         th.appendChild(thText);
         th.setAttribute('colspan', months.length);
         tHead.appendChild(th);
@@ -118,7 +128,7 @@
             // table row creation
             var row = document.createElement("tr");
             var cell1 = document.createElement("th");    
-            var cellText1 = document.createTextNode(categories[i]); 
+            var cellText1 = document.createTextNode(categories[i].name);
             cell1.appendChild(cellText1);
             row.appendChild(cell1);
             for (var j = 1; j <= months.length; j++) {
@@ -126,14 +136,14 @@
                 //Make text node the contents of <td> element
                 // put <td> at end of the table row
              var cell = document.createElement("td");    
-             var cellText = document.createTextNode("-"); 
+             var cellText = document.createTextNode(year.categories[i].values[j-1]);
               cell.appendChild(cellText);
               cell.setAttribute("contenteditable", "true");
               cell.setAttribute("onclick", "makeBold(this)");
-              cell.setAttribute("onblur", "rewriteNextItemsInRow(this, " + year + ")");
+              cell.setAttribute("onblur", "rewriteNextItemsInRow(this, " + year.year + ")");
               var currentMonth = new Date().getMonth()+1;
               var currentYear = new Date().getFullYear();
-              if (j == currentMonth && currentYear==year) {
+              if (j == currentMonth && currentYear==year.year) {
                 cell.setAttribute("bgcolor", "#f9f098");
               }
               row.appendChild(cell);
@@ -167,23 +177,27 @@
         // put <table> in the <body>
         body.appendChild(table);
         // tbl border attribute to 
-        table.setAttribute("id", "chartsTable"+year);
+        table.setAttribute("id", "chartsTable"+year.year);
         table.setAttribute("class", "datagrid");
+        localStorage.setItem("year" + year.year, JSON.stringify(year));
       }
      
       
 </script>
-</head>
+{% endblock%}
 
-<body>
+{% block content %}
 
 <div id="chart" class="datagrid"></div>
+
+<button onclick="closingCode()">this</button>
+
+
   
   <script>
-  generateTable("2018");
-  generateTable("2019");
-  generateTable("2020");
+  generateTable('{{ money_flow.years.0 }}');
+  generateTable('{{ money_flow.years.1 }}');
+  generateTable('{{ money_flow.years.2 }}');
   </script>
 
-</body>
-</html>
+{% endblock %}

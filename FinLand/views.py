@@ -33,7 +33,43 @@ def returnMatrix(request):
         return render(request, "returnMatrix.html", context);
 
 def moneyFlow(request):
-    return render(request, "moneyFlow.html");
+    money_flow = client.find_document("money_flow", {"user": auth.get_user(request).id})
+    client.update_document("return_matrices", {"user": auth.get_user(request).id}, {'$set': {
+        "user": auth.get_user(request).id,
+        "years": [
+            {"year" : 2018,
+                "categories": [
+                    {"name": "Custom 1", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                    {"name": "Custom 2", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                    {"name": "Bonus - Cash", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                    {"name": "Bonus - Newport", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+            },
+            {"year" : 2019,
+                "categories": [{"name": "Custom 1",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Custom 2",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Cash",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Newport",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+            },
+            {"year" : 2020,
+                "categories": [{"name": "Custom 1",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Custom 2",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Cash",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Newport",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+             }]
+    }})
+    if (money_flow is None):
+        createMoneyFlow(auth.get_user(request))
+        money_flow = client.find_document("money_flow", {"user": auth.get_user(request).id})
+    context = {"money_flow" : money_flow}
+    return render(request, "moneyFlow.html", context);
 
 def logout(request):
     auth.logout(request);
@@ -55,6 +91,13 @@ def login(request):
         else:
             if (request.POST.get('action') == "Register"):
                 user = User.objects.create_user(username, email, password)
+                client.insert_document("return_matrices", {
+                    "user":user.id,
+                    "present_value": "500,000",
+                    "years": 15,
+                    "actual_contributions": "1,000,000"})
+                createMoneyFlow(user);
+
             elif (request.POST.get('action') == "Login"):
                 user = auth.authenticate(username=username, password=password);
 
@@ -67,3 +110,35 @@ def login(request):
     else:
         return render(request, "register.html")
 
+def createMoneyFlow(user):
+    client.insert_document("money_flow", {
+        "user": user.id,
+        "years": [
+            {"year" : 2018,
+                "categories": [
+                    {"name": "Custom 1", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                    {"name": "Custom 2", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                    {"name": "Bonus - Cash", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                    {"name": "Bonus - Newport", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+            },
+            {"year" : 2019,
+                "categories": [{"name": "Custom 1",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Custom 2",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Cash",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Newport",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+            },
+            {"year" : 2020,
+                "categories": [{"name": "Custom 1",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Custom 2",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Cash",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
+                               {"name": "Bonus - Newport",
+                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+             }]
+    })

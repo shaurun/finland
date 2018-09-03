@@ -1,65 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>FinLand</title>
-        <style>
-        html, body {margin: 0; padding: 0;}
+{%  extends 'common.html' %}
 
-#header {
-    border-top:7px solid #62676b;
-    margin:0 auto;
-    background: #eee;
-    height: 45px;
-    padding: 10px 0px 10px;
-    font: 12px arial, sans-serif;
-}
-
-#header h1 {
-    margin-left: 65px;
-    float: left;
-    width: 197px;
-    height: 25px;
-    background: url(http://dummyimage.com/197x25/62676b/FFF&text=FINLAND_LOGO) no-repeat 0 0;
-    text-indent: -9999px;
-}
-
-#header form {
-    float: right;
-    margin-right: 30px;
-    height: 40px;
-    padding-top: 8px;
-}
-
-#header form label, header a {
-    display: inline-block;
-    margin: 0 2px;
-}
-
-#header form input {}
-
-#header form #username,
-#header form #password,
-#header a{
-    display: block;
-    width: 250px;
-    border: 1px solid #eee;
-    padding: 3px 0 3px 0;
-    margin-bottom: -1px;
-}
-
-#header form .submit {
-    height: 23px;
-    vertical-align: bottom;
-    background: #77a7f4;
-    color: #fff;
-    border: 1px solid #ddd;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
-
-.list-type3{
+{% block style_extension %}
+    .list-type3{
 margin:0 auto;
 width:300px;
     float: left;
@@ -125,36 +67,9 @@ border-color:transparent #0089e0 transparent transparent;
 }
 
 p { color: #111; font-family: 'Open Sans Condensed', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase;}
+{% endblock%}
 
-    </style>
-</head>
-<body>
-
-<div class="page-wrap">
-
-    <div id="header">
-  <h1>Logo</h1>
-      {% if user.is_authenticated %}
-          <form action="logout" method="get">
-              {%  csrf_token %}
-              <input class="submit" type="submit" name="action" value="Logout ({{ user.username }})"/>
-           </form>
-
-      {% else %}
-          <form action="login" method="post">
-                        {%  csrf_token %}
-                        {%  if login_error %}
-                            <label class="error">{{ login_error }}</label>
-                        {%  endif %}
-                            <label for="username">Username<input type="text" name="username" id="username" {% if username %}value="{{ username }}"{% endif %}/></label>
-                            <label for="password">Password<input type="password" name="password" id="password" {% if password %}value="{{ password }}"{% endif %}/></label>
-                            <input class="submit" type="submit" name="action" value="Login"/> |
-                            <input class="submit" type="submit" name="action" value="Register"/>
-           </form>
-      {% endif %}
-</div>
-
-
+{% block content %}
         <h1>This page exists for easier access to features. Use following links to access pages for testing:</h1>
         <div class="list-type3">
         <ul>
@@ -162,9 +77,4 @@ p { color: #111; font-family: 'Open Sans Condensed', sans-serif; font-size: 24px
             <li><a href="moneyFlow">Money Flow</a> </li>
         </ul>
         </div>
-
-</div>
-
-
-</body>
-</html>
+{% endblock %}
