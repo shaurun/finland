@@ -62,6 +62,15 @@
 
       function closingCode(){
          alert(localStorage.getItem("year2018"));
+         var http = new XMLHttpRequest();
+          var url = '/moneyFlow';
+          var params = 'money_flow='+ localStorage.getItem("year2018");
+          http.open('POST', url, true);
+
+            //Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
+          http.send(params);
       }
 
 

@@ -1,5 +1,9 @@
+import json
+
+from bson.json_util import dumps
 from django.contrib import auth
 from django.contrib.auth.models import User
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django.template.context_processors import csrf
 
@@ -8,10 +12,19 @@ from FinLand.mongo import MongoDBClient
 client = MongoDBClient('mongodb://heroku_4nzjwz0z:dcvtdbro5ppqqahpdrc8m83lcl@ds131902.mlab.com/heroku_4nzjwz0z', 31902)
 client.connect('heroku_4nzjwz0z')
 
+
 def index(request):
     return render(request, "index.html");
 
+
+def returnMatrixData(request):
+    return_matrix = client.find_document("return_matrices", {"user": auth.get_user(request).id})
+    return JsonResponse(json.loads(dumps(return_matrix)))
+
 def returnMatrix(request):
+    if (request.META.get('CONTENT_TYPE') == 'application/json'):
+        return returnMatrixData(request);
+
     if (request.POST):
         years = request.POST.get('years', '');
         present_value = request.POST.get('present_value', 18);
@@ -33,43 +46,16 @@ def returnMatrix(request):
         return render(request, "returnMatrix.html", context);
 
 def moneyFlow(request):
-    money_flow = client.find_document("money_flow", {"user": auth.get_user(request).id})
-    client.update_document("return_matrices", {"user": auth.get_user(request).id}, {'$set': {
-        "user": auth.get_user(request).id,
-        "years": [
-            {"year" : 2018,
-                "categories": [
-                    {"name": "Custom 1", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                    {"name": "Custom 2", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                    {"name": "Bonus - Cash", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                    {"name": "Bonus - Newport", "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
-            },
-            {"year" : 2019,
-                "categories": [{"name": "Custom 1",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                               {"name": "Custom 2",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                               {"name": "Bonus - Cash",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                               {"name": "Bonus - Newport",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
-            },
-            {"year" : 2020,
-                "categories": [{"name": "Custom 1",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                               {"name": "Custom 2",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                               {"name": "Bonus - Cash",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]},
-                               {"name": "Bonus - Newport",
-                                "values": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
-             }]
-    }})
-    if (money_flow is None):
-        createMoneyFlow(auth.get_user(request))
+    if (request.POST):
+        money_flow = '{"years": [ ' + request.POST.get('money_flow') + ']}';
+        client.update_document("money_flow", {"user":auth.get_user(request).id}, { '$set':  json.loads(money_flow) })
+    else:
         money_flow = client.find_document("money_flow", {"user": auth.get_user(request).id})
-    context = {"money_flow" : money_flow}
-    return render(request, "moneyFlow.html", context);
+        if (money_flow is None):
+            createMoneyFlow(auth.get_user(request))
+            money_flow = client.find_document("money_flow", {"user": auth.get_user(request).id})
+        context = {"money_flow" : money_flow}
+        return render(request, "moneyFlow.html", context);
 
 def logout(request):
     auth.logout(request);

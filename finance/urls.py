@@ -22,7 +22,7 @@ from FinLand import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', views.index),
-    url(r'^returnMatrix$', views.returnMatrix),
+    url(r'^returnMatrix$', views.returnMatrix, name="returnMatrix"),
     url(r'^moneyFlow$', views.moneyFlow),
     url(r'^login$', views.login, name='login'),
     url(r'^logout$', views.logout, name='logout'),

@@ -23,20 +23,18 @@
       google.charts.setOnLoadCallback(drawTable);
       window.onbeforeunload = closingCode;
 
-      function closingCode(){
+      function closingCode(evt){
+          alert(evt);
           var http = new XMLHttpRequest();
           var url = '/returnMatrix';
-           var years = document.getElementById("years").value;
-        var sum = document.getElementById("presentValue").value;
-        var actualContributions = document.getElementById("actualContributions").value;
-          var params = 'years='+ years + '&present_value=' +sum +'&actual_contributions=' +actualContributions;
+          var params = 'years='+ localStorage.getItem("years") + '&present_value=' +localStorage.getItem("presentValue") +'&actual_contributions=' +localStorage.getItem("actualContributions");
           http.open('POST', url, true);
 
             //Send the proper header information along with the request
             http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
           http.send(params);
-
+          localStorage.clear();
       }
 
 
@@ -61,7 +59,49 @@
         element.value = text;
       }
 
+      function getRM() {
+          var handleResponse = function (status, response) {
+            alert(response)
+            }
+            var http=new XMLHttpRequest();
+          var handleStateChange = function () {
+               switch (http.readyState) {
+                  case 0 : // UNINITIALIZED
+                  case 1 : // LOADING
+                  case 2 : // LOADED
+                  case 3 : // INTERACTIVE
+                  break;
+                  case 4 : // COMPLETED
+                  handleResponse(http.status, http.responseText);
+                  break;
+                  default: alert("error");
+               }
+          }
+
+            http.onreadystatechange=handleStateChange;
+            http.open("GET",'{% url 'returnMatrix'  %}',true);
+            http.setRequestHeader('Content-type', 'application/json');
+            http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
+            http.send(null);
+      }
+
       function createData(annual) {
+          if (localStorage.getItem('return_matrix') === null) {
+              var http = new XMLHttpRequest();
+              var url = '/returnMatrix';
+                http.open('GET', url, true);
+
+            //Send the proper header information along with the request
+            http.setRequestHeader('Content-type', 'application/json');
+            http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
+          http.send();
+
+              if (http.readyState == 4)
+                  if (http.status == 200)
+                      alert(http.responseText);
+
+              //localStorage.setItem('return_matrix', '{{ return_matrix }}')
+          }
         var years = document.getElementById("years").value;
         var sum = document.getElementById("presentValue").value;
         var actualContributions = document.getElementById("actualContributions").value;
@@ -146,4 +186,6 @@ Actual contributions:<br>
 <input type="text" id="actualContributions" oninput="drawTable(); maskCurrecnyField(this)" value="{{ return_matrix.actual_contributions }}"/><br><br>
 </form>
 </div>
+
+    <button onclick="getRM()">click</button>
 {% endblock %}
