@@ -67,8 +67,22 @@
          *        1: beginning of period
          */
       function PMT(ir, np, pv, fv, type) {
-        var pmt = ( ir * ( pv * Math.pow ( (ir+1), np ) + fv ) ) / ( ( ir + 1 ) * ( Math.pow ( (ir+1), np) -1 ) );
-        return pmt;
+          if(ir != 0.0){
+            // Interest rate exists
+            var q = Math.pow(1 + ir, np);
+            return -(ir * (fv + (q * pv))) / ((-1 + q) * (1 + ir * (type)));
+
+            } else if(np != 0.0){
+        // No interest rate, but number of payments exists
+        return -(fv + pv) / np;
+    }
+
+    return 0;
+
+        /*var pmt = type == 0 ?
+            ( ir * ( pv * Math.pow ( (ir+1), np ) + fv ) ) / ( ( ir + 1 ) * ( Math.pow ( (ir+1), np) -1 ) )
+            : (pv - fv) * ir/(1 - Math.pow((1 + ir), -(np)));
+        return pmt;*/
       }
 
       function maskCurrecnyField(element) {
@@ -106,6 +120,7 @@
       function createData(annual) {
           var returnMatrix = JSON.parse(localStorage.getItem('return_matrix'));
           var years = document.getElementById("years").value;
+          years = years == "" ? 1 : years;
           var sum = document.getElementById("presentValue").value;
           var actualContributions = document.getElementById("actualContributions").value;
           sum = sum.replace(new RegExp(',', 'g'), '');
@@ -128,16 +143,20 @@
           }
           data.addRows(sumsToReachInMlns.length);
 
+          var numberOfTargetsBitten = 0;
+          var maxTargets = percents.length*sumsToReachInMlns.length;
           for (var i = 0; i < sumsToReachInMlns.length; i++) {
               var sumToReach = 1000000*sumsToReachInMlns[i];
               data.setCell(i, 0, sumToReach, null, {'style': 'font-weight: bold'}); //sum to reach
 
               for (var j = 1; j <= percents.length; j++) {
                   var percent = percents[j-1];
-                  var addPerYear = -PMT(percent/100, years, sum, -sumToReach, 0);
+                  var addPerYear = PMT(percent/100, years, sum, -sumToReach, 0);
                   var value = annual ? addPerYear : addPerYear/12;
-
-                  data.setCell(i, j, Math.round(value)/1000, null,
+                  if (value < 0) {
+                      numberOfTargetsBitten++;
+                  }
+                  data.setCell(i, j, Math.round(value)/*/1000*/, null,
                       value < 0 ? {'style': 'background-color: #6fe893; color: grey; font-weight: lighter; min-width:100px; max-width: 100px;'} :
                           value >= 0.75*actualContributions && value <= 1.15*actualContributions ?
                               {'style': 'background-color: #edd76d; min-width:50px;'} : {'style': 'min-width:100px; max-width: 100px;'});
@@ -146,6 +165,17 @@
 
           for (var j = 0; j <= percents.length; j++) {
               formatter.format(data, j); // Apply formatter
+          }
+
+          switch (numberOfTargetsBitten) {
+              case 0:
+                  document.getElementById("insight").innerText =
+                      "Current contribution won't allow you to reach 1 million dollar target over the coarse of " + years +" years";
+                  break;
+              case maxTargets:
+                  document.getElementById("insight").innerText = "You're on target to reach 25 million and beyond! Well done";
+                  break;
+              default: document.getElementById("insight").innerText = "You need to contribute more";
           }
 
           return data;
@@ -209,6 +239,8 @@ Actual contributions:<br>
 <input type="text" id="actualContributions" oninput="drawTable(); maskCurrecnyField(this)" value="loading"/><br><br>
 </form>
 </div>
+
+        <p id="insight"></p>
     {%  else %}
         <div>
             <p>This function only available for logged in users. Please log in.</p>
