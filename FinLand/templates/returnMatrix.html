@@ -17,24 +17,43 @@
     }
 {% endblock%}
 {% block js_scripts %}
+
+    {% if user.is_authenticated %}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['table']});
       google.charts.setOnLoadCallback(drawTable);
       window.onbeforeunload = closingCode;
 
-      function closingCode(evt){
-          alert(evt);
+      var myVar = setInterval(myTimer, 10000);
+
+      function myTimer() {
+          if (changed) {
+              var http = new XMLHttpRequest();
+              var url = '/returnMatrix';
+
+              params = 'return_matrix=' + localStorage.getItem('return_matrix');
+              http.open('POST', url, true);
+
+              //Send the proper header information along with the request
+              http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+              http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
+              http.send(params);
+              console.log("saved")
+              changed = false;
+          }
+      };
+
+      function closingCode(){
           var http = new XMLHttpRequest();
           var url = '/returnMatrix';
-          var params = 'years='+ localStorage.getItem("years") + '&present_value=' +localStorage.getItem("presentValue") +'&actual_contributions=' +localStorage.getItem("actualContributions");
+          var params = 'return_matrix='+ localStorage.getItem('return_matrix');
           http.open('POST', url, true);
 
             //Send the proper header information along with the request
             http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
           http.send(params);
-          localStorage.clear();
       }
 
 
@@ -54,119 +73,123 @@
 
       function maskCurrecnyField(element) {
         text = element.value;
-        text = text.replace(new RegExp(',', 'g'), '');
-        text = text.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        element.value = text;
+        element.value = maskCurrecny(text);
+      }
+
+      function maskCurrecny(str) {
+        str = str.replace(new RegExp(',', 'g'), '');
+        str = str.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        return str;
       }
 
       function getRM() {
-          var handleResponse = function (status, response) {
-            alert(response)
-            }
-            var http=new XMLHttpRequest();
-          var handleStateChange = function () {
-               switch (http.readyState) {
-                  case 0 : // UNINITIALIZED
-                  case 1 : // LOADING
-                  case 2 : // LOADED
-                  case 3 : // INTERACTIVE
-                  break;
-                  case 4 : // COMPLETED
-                  handleResponse(http.status, http.responseText);
-                  break;
-                  default: alert("error");
-               }
-          }
-
-            http.onreadystatechange=handleStateChange;
-            http.open("GET",'{% url 'returnMatrix'  %}',true);
-            http.setRequestHeader('Content-type', 'application/json');
-            http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
-            http.send(null);
+           return new Promise(function (resolve, reject) {
+              var handleResponse = function (status, response) {
+                    localStorage.setItem('return_matrix', response);
+                    resolve();
+              }
+              var http=new XMLHttpRequest();
+              var handleStateChange = function () {
+                  switch (http.readyState) {
+                      case 0 : case 1 : case 2 : case 3 : break;
+                      case 4 : handleResponse(http.status, http.responseText); break;
+                  }
+              }
+              http.onreadystatechange=handleStateChange;
+              http.open("GET",'{% url 'returnMatrix'  %}',true);
+              http.setRequestHeader('Content-type', 'application/json');
+              http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
+              http.send(null);
+          });
       }
 
       function createData(annual) {
-          if (localStorage.getItem('return_matrix') === null) {
-              var http = new XMLHttpRequest();
-              var url = '/returnMatrix';
-                http.open('GET', url, true);
+          var returnMatrix = JSON.parse(localStorage.getItem('return_matrix'));
+          var years = document.getElementById("years").value;
+          var sum = document.getElementById("presentValue").value;
+          var actualContributions = document.getElementById("actualContributions").value;
+          sum = sum.replace(new RegExp(',', 'g'), '');
+          actualContributions = actualContributions.replace(new RegExp(',', 'g'), '');
 
-            //Send the proper header information along with the request
-            http.setRequestHeader('Content-type', 'application/json');
-            http.setRequestHeader('X-CSRFToken', '{{  csrf_token }}');
-          http.send();
+          /*save data to local storage*/
+          returnMatrix['years'] = years;
+          returnMatrix["present_value"] = sum;
+          returnMatrix["actual_contributions"] = actualContributions;
+          localStorage.setItem('return_matrix', JSON.stringify(returnMatrix))
+          actualContributions = annual ? actualContributions : actualContributions/12;
+          var percents = [5, 6, 7, 8, 9, 10, 12, 15];
+          var sumsToReachInMlns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 25]
 
-              if (http.readyState == 4)
-                  if (http.status == 200)
-                      alert(http.responseText);
-
-              //localStorage.setItem('return_matrix', '{{ return_matrix }}')
+          var data = new google.visualization.DataTable();
+          data.addColumn('number', '');
+          var formatter = new google.visualization.NumberFormat({prefix: '$', fractionDigits: 0});
+          for (var i = 0; i < percents.length; i++) {
+              data.addColumn('number', percents[i]+'%');
           }
-        var years = document.getElementById("years").value;
-        var sum = document.getElementById("presentValue").value;
-        var actualContributions = document.getElementById("actualContributions").value;
-        sum = sum.replace(new RegExp(',', 'g'), '');
-        actualContributions = actualContributions.replace(new RegExp(',', 'g'), '');
+          data.addRows(sumsToReachInMlns.length);
 
-        /*save data to locat storage*/
-        localStorage.setItem('years', years);
-        localStorage.setItem("presentValue", sum);
-        localStorage.setItem("actualContributions", actualContributions);
-        actualContributions = annual ? actualContributions : actualContributions/12;
-        var percents = [5, 6, 7, 8, 9, 10, 12, 15];
-        var sumsToReashInMlns = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 25]
+          for (var i = 0; i < sumsToReachInMlns.length; i++) {
+              var sumToReach = 1000000*sumsToReachInMlns[i];
+              data.setCell(i, 0, sumToReach, null, {'style': 'font-weight: bold'}); //sum to reach
 
-        var data = new google.visualization.DataTable();
+              for (var j = 1; j <= percents.length; j++) {
+                  var percent = percents[j-1];
+                  var addPerYear = -PMT(percent/100, years, sum, -sumToReach, 0);
+                  var value = annual ? addPerYear : addPerYear/12;
 
-        data.addColumn('number', '');
-        var formatter = new google.visualization.NumberFormat({prefix: '$', fractionDigits: 0});
-        for (var i = 0; i < percents.length; i++) {
-           data.addColumn('number', percents[i]+'%');
-        }
-        data.addRows(sumsToReashInMlns.length);
-
-        for (var i = 0; i < sumsToReashInMlns.length; i++) {
-          var sumToReach = 1000000*sumsToReashInMlns[i];
-          data.setCell(i, 0, sumToReach, null, {'style': 'font-weight: bold'}); //sum to reach
-
-          for (var j = 1; j <= percents.length; j++) {
-            var percent = percents[j-1];
-            var addPerYear = -PMT(percent/100, years, sum, -sumToReach, 0);
-            var value = annual ? addPerYear : addPerYear/12;
-
-            data.setCell(i, j, Math.round(value)/1000, null,
-            value < 0 ? {'style': 'background-color: #6fe893; color: grey; font-weight: lighter; min-width:50px;'} :
-            value >= 0.75*actualContributions && value <= 1.15*actualContributions ?
-            {'style': 'background-color: #edd76d; min-width:50px;'} :
-            {'style': 'min-width:50px;'});
+                  data.setCell(i, j, Math.round(value)/1000, null,
+                      value < 0 ? {'style': 'background-color: #6fe893; color: grey; font-weight: lighter; min-width:100px; max-width: 100px;'} :
+                          value >= 0.75*actualContributions && value <= 1.15*actualContributions ?
+                              {'style': 'background-color: #edd76d; min-width:50px;'} : {'style': 'min-width:100px; max-width: 100px;'});
+              }
           }
-        }
 
-        for (var j = 0; j <= percents.length; j++) {
-          formatter.format(data, j); // Apply formatter
-        }
+          for (var j = 0; j <= percents.length; j++) {
+              formatter.format(data, j); // Apply formatter
+          }
 
-        return data;
+          return data;
       }
 
       function drawAnnualTable() {
-        var table = new google.visualization.Table(document.getElementById('annual_table_div'));
-        table.draw(createData(true), {showRowNumber: false, chartArea:{left:0,top:0}, width: '100%', 'allowHtml': true});
+          var table = new google.visualization.Table(document.getElementById('annual_table_div'));
+          table.draw(createData(true), {showRowNumber: false, chartArea:{left:0,top:0}, 'allowHtml': true});
       }
 
       function drawMonthlyTable() {
-        var table = new google.visualization.Table(document.getElementById('month_table_div'));
-        table.draw(createData(false), {showRowNumber: false, chartArea:{left:0,top:0}, width: '100%', 'allowHtml': true});
+          var table = new google.visualization.Table(document.getElementById('month_table_div'));
+          table.draw(createData(false), {showRowNumber: false, chartArea:{left:0,top:0}, 'allowHtml': true});
       }
 
+      var changed = false;
+
       function drawTable() {
-        drawAnnualTable();
-        drawMonthlyTable();
+          var draw = function () {
+              var returnMatrix = JSON.parse(localStorage.getItem("return_matrix"));
+              var years = document.getElementById("years");
+              var presentValue = document.getElementById("presentValue");
+              var actualContributipns = document.getElementById("actualContributions");
+              years.value = years.value == "loading" ? returnMatrix.years : years.value;
+              presentValue.value = presentValue.value == "loading" ? maskCurrecny(returnMatrix.present_value) : presentValue.value;
+              actualContributipns.value = actualContributipns.value == "loading" ? maskCurrecny(returnMatrix.actual_contributions) : actualContributipns.value;
+              console.log(localStorage.getItem('return_matrix'));
+              drawAnnualTable();
+              drawMonthlyTable();
+          };
+          if (localStorage.getItem('return_matrix') === null) {
+              getRM().then(draw);
+          } else {
+              draw();
+          }
+          changed = true;
       }
 </script>
+    {% endif %}
 {% endblock%}
 
 {% block content %}
+
+    {% if user.is_authenticated %}
     <div class="chart">
   <div align="center" bgcolor="#c1ccb5">Annually</div>
   <div id="annual_table_div"></div>
@@ -179,13 +202,16 @@
 <div class="input">
 <form>
 Present value:<br>
-<input type="text" oninput="drawTable(); maskCurrecnyField(this)" name="amount" id="presentValue" value="{{ return_matrix.present_value }}"/><br>
+<input type="text" oninput="drawTable(); maskCurrecnyField(this)" name="amount" id="presentValue" value="loading"/><br>
 Years:<br>
-<input type="text" id="years" oninput="drawTable()" value="{{ return_matrix.years }}"/><br><br>
+<input type="text" id="years" oninput="drawTable()" value="loading"/><br><br>
 Actual contributions:<br>
-<input type="text" id="actualContributions" oninput="drawTable(); maskCurrecnyField(this)" value="{{ return_matrix.actual_contributions }}"/><br><br>
+<input type="text" id="actualContributions" oninput="drawTable(); maskCurrecnyField(this)" value="loading"/><br><br>
 </form>
 </div>
-
-    <button onclick="getRM()">click</button>
+    {%  else %}
+        <div>
+            <p>This function only available for logged in users. Please log in.</p>
+        </div>
+    {% endif %}
 {% endblock %}

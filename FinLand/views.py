@@ -22,28 +22,16 @@ def returnMatrixData(request):
     return JsonResponse(json.loads(dumps(return_matrix)))
 
 def returnMatrix(request):
-    if (request.META.get('CONTENT_TYPE') == 'application/json'):
-        return returnMatrixData(request);
-
     if (request.POST):
-        years = request.POST.get('years', '');
-        present_value = request.POST.get('present_value', 18);
-        actual_contributions = request.POST.get('actual_contributions', '');
-        obj = {
-            "present_value": present_value,
-            "years": int(years),
-            "actual_contributions": actual_contributions
-        };
+        return_matrix = request.POST.get('return_matrix');
+        obj = json.loads(return_matrix);
+        del obj["_id"]
         client.update_document("return_matrices", {"user":auth.get_user(request).id}, { '$set':  obj })
+        return JsonResponse(json.loads('{"status": "ok"}'))
     else:
-        return_matrix = client.find_document("return_matrices" , {"user":auth.get_user(request).id})
-        context = {
-            "return_matrix" : return_matrix
-            #"present_value": "500,000",
-            #"years": 15,
-            #"actual_contributions": "1,000,000"
-        }
-        return render(request, "returnMatrix.html", context);
+        if (request.META.get('CONTENT_TYPE') == 'application/json'):
+            return returnMatrixData(request);
+        return render(request, "returnMatrix.html");
 
 def moneyFlow(request):
     if (request.POST):

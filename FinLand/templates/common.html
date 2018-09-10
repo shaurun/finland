@@ -67,19 +67,19 @@
 <div id="header">
     <h1><a href="/">Logo</a></h1>
     {% if user.is_authenticated %}
-        <form action="logout" method="get">
+        <form action="logout" onsubmit="localStorage.clear()" method="get">
             {%  csrf_token %}
             <input class="submit" type="submit" name="action" value="Logout ({{ user.username }})"/>
         </form>
 
     {% else %}
-        <form action="login" method="post">
+        <form action="login" onsubmit="localStorage.clear()" method="post">
             {%  csrf_token %}
             {%  if login_error %}
                 <label class="error">{{ login_error }}</label>
             {%  endif %}
-            <label for="username">Username<input type="text" name="username" id="username" {% if username %}value="{{ username }}"{% endif %}/></label>
-            <label for="password">Password<input type="password" name="password" id="password" {% if password %}value="{{ password }}"{% endif %}/></label>
+            <label for="username">Username<input autocomplete="on" type="text" name="username" id="username" {% if username %}value="{{ username }}"{% endif %}/></label>
+            <label for="password">Password<input autocomplete="off" type="password" name="password" id="password" {% if password %}value="{{ password }}"{% endif %}/></label>
             <input class="submit" type="submit" name="action" value="Login"/> |
             <input class="submit" type="submit" name="action" value="Register"/>
         </form>
