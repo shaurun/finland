@@ -157,7 +157,7 @@
                       numberOfTargetsBitten++;
                   }
                   data.setCell(i, j, Math.round(value)/*/1000*/, null,
-                      value < 0 ? {'style': 'background-color: #6fe893; color: grey; font-weight: lighter; min-width:100px; max-width: 100px;'} :
+                      (value < 0 || value-actualContributions < 0)? {'style': 'background-color: #6fe893; color: grey; font-weight: lighter; min-width:100px; max-width: 100px;'} :
                           value >= 0.75*actualContributions && value <= 1.15*actualContributions ?
                               {'style': 'background-color: #edd76d; min-width:50px;'} : {'style': 'min-width:100px; max-width: 100px;'});
               }
